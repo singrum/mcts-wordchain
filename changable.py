@@ -1,11 +1,6 @@
 import collections
 
-global history
-history = {}
-
 def changable(char):
-    if char in history:
-        return history[char]
 
     o = ord(char)
     result = (char,)
@@ -36,7 +31,6 @@ def changable(char):
 
     else:
         return result
-    history[char] = result
     return result
 
 CHO = [

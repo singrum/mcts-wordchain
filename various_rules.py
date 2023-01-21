@@ -1,6 +1,8 @@
 from wordchain import *
 import changable
 
+
+
 class GeneralizedKor(WordRule):
     def __init__(self, minlen, maxlen, headindex, tailindex, changable = True):
         self.minlen = minlen
@@ -30,9 +32,10 @@ class GeneralizedKor(WordRule):
 
 class Kor(WordRule):
 
+
     def get_data(self):
         with open("data/elrule.txt", 'r') as f:
-            word_list = [word.strip('\n').strip('\ufeff').strip(' ') for word in f.readlines()]
+            word_list = [word.strip('\n') for word in f.readlines() if len(word.strip('\n')) >=2]
         return word_list
     
     def head(self, word):

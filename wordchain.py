@@ -32,37 +32,6 @@ class WordRule(ABC):
             result[self.tail(word)]
         return result
 
-# class Turn:
-
-#     trail = []
-
-#     def __init__(self, rule, curr, history):
-#         self.rule = rule
-#         self.curr = curr
-#         self.history = history
-
-#     def next_words(self):
-#         result = set()
-#         for c_index in self.rule.changable(self.curr):
-#             result.update(self.rule.word_dict[c_index])
-#         return result - self.history
-
-#     def make_move(self, word):
-#         Turn.trail.append(word)
-#         return Turn(self.rule, self.rule.tail(word), self.history | {word})
-    
-#     def is_win(self, trail = None):
-#         if not trail:
-#             trail = []
-#         if not self.next_words() and len(trail) % 2 == 1:
-#             print(trail)
-#         for word in self.next_words():
-#             next_turn = self.make_move(word)
-#             if not next_turn.is_win(trail + [word]):
-#                 return word
-#         return False            
-
-
 class IndexManager:
 
     def __init__(self, rule):
