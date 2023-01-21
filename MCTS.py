@@ -104,3 +104,4 @@ def learn(root, stack,num = 100):
 
 learn(Node(None, '족'), stack, 1000)
 
+# dictionary 대신 graph로 바꾸자
