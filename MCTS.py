@@ -35,6 +35,20 @@ def filter(object): # object = Counter
         if key == 0:
             object.pop(val)
 
+def makeChangableNode(graph):
+    changable_subgraph = {}
+    for char in graph:
+        if len(changable.changable(char)) > 1:
+            for chan in changable.changable(char)[1:]:
+                changable_subgraph[(char, chan)] = Counter({})
+                changable_subgraph[(char, chan)][chan] += 1
+                graph[char][(char, chan)] += 1
+    for key,val in changable_subgraph.items():
+        graph[key] = val
+    
+
+makeChangableNode(all_words_graph)
+
 
 class Node:
     def __init__(self, parent, curr_char, graph = all_words_graph):
@@ -92,36 +106,36 @@ class Node:
         return f'({self.curr_char}), {self.w}/{self.n}'
 
 
-stack = []
-def simulate(root, stack):
-    ptr = root
-    stack.append(ptr)
-    while ptr.nextChar():
-        if ptr.isComplete():
-            ptr = ptr.select()
-        else:
-            ptr = ptr.expand()
-        stack.append(ptr)
-def backpropagate(stack):
-    alternater = True
-    while stack:
-        node = stack.pop()
-        node.n += 1
-        if alternater:
-            node.w += 1
+# stack = []
+# def simulate(root, stack):
+#     ptr = root
+#     stack.append(ptr)
+#     while ptr.nextChar():
+#         if ptr.isComplete():
+#             ptr = ptr.select()
+#         else:
+#             ptr = ptr.expand()
+#         stack.append(ptr)
+# def backpropagate(stack):
+#     alternater = True
+#     while stack:
+#         node = stack.pop()
+#         node.n += 1
+#         if alternater:
+#             node.w += 1
 
-        alternater = not alternater
+#         alternater = not alternater
 
-def learn(root, stack,num = 50):
-    for i in range(num):
-        print(f'{i}회')
-        simulate(root, stack)
-        backpropagate(stack)
-    with open("learn_record/1.p", 'wb') as f:
-        pickle.dump(root, f)
-    print(max(root.children, key = lambda x : root.children[x].w))
+# def learn(root, stack,num = 50):
+#     for i in range(num):
+#         print(f'{i}회')
+#         simulate(root, stack)
+#         backpropagate(stack)
+#     with open("learn_record/1.p", 'wb') as f:
+#         pickle.dump(root, f)
+#     print(max(root.children, key = lambda x : root.children[x].w))
 
-learn(Node(None, "족"), stack, 200)
-with open("learn_record/1.p", 'rb') as f:
-    root = pickle.load(f)
-print(root.children)
+# learn(Node(None, "족"), stack, 200)
+# with open("learn_record/1.p", 'rb') as f:
+#     root = pickle.load(f)
+# print(root.children)
