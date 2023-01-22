@@ -1,6 +1,9 @@
 from collections import Counter
 
-a = (1,2)
-b = [1,2]
 
-print(a)
+d = {1 : 2, 3: 3, 2 : 1}
+char = d.keys()
+char = sorted(char)
+print(char)
+
+print(ord('아'))

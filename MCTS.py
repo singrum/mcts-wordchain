@@ -40,22 +40,31 @@ def makeChangableNode(graph):
     for char in graph:
         if len(changable.changable(char)) > 1:
             for chan in changable.changable(char)[1:]:
+                if not chan in graph:
+                    continue
                 changable_subgraph[(char, chan)] = Counter({})
                 changable_subgraph[(char, chan)][chan] += 1
                 graph[char][(char, chan)] += 1
     for key,val in changable_subgraph.items():
         graph[key] = val
-    
+
+def showDict(d):
+    char = d.keys()
+    for c in char:
+        print(c, ' : ', d[c])
+
+
 
 makeChangableNode(all_words_graph)
-
+# 두음 노드는 써도 사라지지 않음
 
 class Node:
-    def __init__(self, parent, curr_char, graph = all_words_graph):
+    def __init__(self, curr_char, parent = None, graph = all_words_graph):
         self.n, self.w = 0, 0
         self.parent = parent
         self.curr_char = curr_char
         self.graph = graph
+        self.next_char = self.graph[self.curr_char]
         self.children = {}
 
     def select(self):
@@ -70,72 +79,76 @@ class Node:
         return self.parent.n
     
     def expand(self):
-        
-        for char in self.nextChar():
+        for char in self.next_char:
             if char not in self.children:
                 graph_copy = copy(self.graph)
-                for c in changable.changable(self.curr_char):
-                    if c not in graph_copy:
-                        continue
-                    if char in graph_copy[c]:
-                        graph_copy[c][char] -= 1
-                        if graph_copy[c][char] == 0:
-                            graph_copy[c].pop(char)
-                child = Node(self, char, graph_copy)
+                if not (type(self.curr_char) == tuple or type(char) == tuple):
+                    graph_copy[self.curr_char][char] -= 1
+                    if graph_copy[self.curr_char][char] == 0:
+                        graph_copy[self.curr_char].pop(char)
+                child = Node(char, self, graph_copy)
                 self.children[char] = child
                 return child
-
-    def nextChar(self):
-        result = Counter({})
-        for char in changable.changable(self.curr_char):
-            if char not in self.graph:
-                continue
-            result += self.graph[char]
-        return result
         
     def isEnd(self):
-        return False if self.nextChar() else True
+        return False if self.next_char else True
     
     def isComplete(self):
-        return len(self.children) == len(self.nextChar())
+        return len(self.children) == len(self.next_char)
+
+    def loseProb(self):
+        return self.w/self.n
 
     def __str__(self):
-        return f'({self.curr_char}), {self.w}/{self.n}'
+        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 2)})'
 
     def __repr__(self):
-        return f'({self.curr_char}), {self.w}/{self.n}'
+        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 2)})'
 
 
-# stack = []
-# def simulate(root, stack):
-#     ptr = root
-#     stack.append(ptr)
-#     while ptr.nextChar():
-#         if ptr.isComplete():
-#             ptr = ptr.select()
-#         else:
-#             ptr = ptr.expand()
-#         stack.append(ptr)
-# def backpropagate(stack):
-#     alternater = True
-#     while stack:
-#         node = stack.pop()
-#         node.n += 1
-#         if alternater:
-#             node.w += 1
+def simulate(node, stack):
+    ptr = node
+    stack.append(ptr)
+    while ptr.next_char:
+        if ptr.isComplete():
+            ptr = ptr.select()
+        else:
+            ptr = ptr.expand()
+        stack.append(ptr)
+def backpropagate(stack):
+    alternater = True
+    while stack:
+        node = stack.pop()
+        node.n += 1
+        if alternater:
+            node.w += 1
 
-#         alternater = not alternater
+        alternater = not alternater
 
-# def learn(root, stack,num = 50):
-#     for i in range(num):
-#         print(f'{i}회')
-#         simulate(root, stack)
-#         backpropagate(stack)
-#     with open("learn_record/1.p", 'wb') as f:
-#         pickle.dump(root, f)
-#     print(max(root.children, key = lambda x : root.children[x].w))
+def learn(node, num = 50):
+    stack = []
+    for i in range(num):
+        if (i+1) % 100 == 0:
+            print(f'{i+1}회')
+        simulate(node, stack)
+        backpropagate(stack)
 
-# learn(Node(None, "족"), stack, 200)
-# with open("learn_record/1.p", 'rb') as f:
-#     root = pickle.load(f)
-# print(root.children)
+def recommendNextChar(node):
+    return max(node.children, key = lambda x : node.children[x].w / node.children[x].n)
+    
+
+def game():
+    root = Node(input("start : "))
+    learn(root, 200)
+    print(root.children)
+    print(recommendNextChar(root))
+    node = root
+    while True:
+        input_char = input("input : ")
+        if input_char == "r":
+            input_char = recommendNextChar(node)
+        node = node.children[input_char]
+        print(node.children)
+        print("recommnend : ", recommendNextChar(node))
+    
+game()
