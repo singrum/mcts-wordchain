@@ -2,13 +2,30 @@
 import changable
 import pickle
 import math
+import wordchain as wc
+import various_rules as vr
 from collections import Counter, defaultdict
 
+def makePickle():
+    wm = wc.WordManager(vr.Kor())
+    graph = {}
+    for cir in wm.cir_index:
+        counter = Counter({})
+        graph[cir] = counter
+        for word in wm.rule.word_dict[cir]:
+            if word[-1] in wm.cir_index:
+                counter[word[-1]] += 1
+    with open('data/cir_graph.p', 'wb') as f:
+        pickle.dump(graph,f)
+
+def getGraph():
+    with open('data/cir_graph.p', 'rb') as f:
+        graph = pickle.load(f)
+    return graph
+
+all_words_graph = getGraph()
 
 
-
-with open('data/cir_graph.p', 'rb') as f:
-    all_words_graph = pickle.load(f)
 
 def copy(object):
     return {k: v.copy() for (k, v) in object.items()}
@@ -69,10 +86,10 @@ class Node:
         return len(self.children) == len(self.nextChar())
 
     def __str__(self):
-        return self.curr_char
+        return f'({self.curr_char}), {self.w}/{self.n}'
 
     def __repr__(self):
-        return f'({self.curr_char})'
+        return f'({self.curr_char}), {self.w}/{self.n}'
 
 
 stack = []
@@ -95,13 +112,16 @@ def backpropagate(stack):
 
         alternater = not alternater
 
-def learn(root, stack,num = 100):
+def learn(root, stack,num = 50):
     for i in range(num):
         print(f'{i}회')
         simulate(root, stack)
         backpropagate(stack)
+    with open("learn_record/1.p", 'wb') as f:
+        pickle.dump(root, f)
     print(max(root.children, key = lambda x : root.children[x].w))
 
-learn(Node(None, '족'), stack, 1000)
-
-# dictionary 대신 graph로 바꾸자
+learn(Node(None, "족"), stack, 200)
+with open("learn_record/1.p", 'rb') as f:
+    root = pickle.load(f)
+print(root.children)

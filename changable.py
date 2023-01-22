@@ -3,35 +3,29 @@ import collections
 def changable(char):
 
     o = ord(char)
-    result = (char,)
 
-    if ord('라') <= o <= ord('맇'):
-        if ord('러') <= o <= ord('렇'):
-            return result
-        result += (chr(o + ord('나') - ord('라')),)
 
-        if ord('랴') <= o <= ord('럏') or\
-            ord('려') <= o <= ord('렿') or\
-            ord('료') <= o <= ord('룧') or\
-            ord('류') <= o <= ord('륳') or\
-            ord('리') <= o <= ord('리') or\
-            ord('럐') <= o <= ord('럫') or\
-            ord('례') <= o <= ord('롛'):
-            result += ((chr(o + ord('아') - ord('라'))),)
-    
-
-    elif ord('냐') <= o <= ord('냫') or\
-        ord('녀') <= o <= ord('녛') or\
+    if ord('랴') <= o <= ord('럏') or\
+        ord('려') <= o <= ord('렿') or\
+        ord('료') <= o <= ord('룧') or\
+        ord('류') <= o <= ord('륳') or\
+        ord('리') <= o <= ord('맇') or\
+        ord('례') <= o <= ord('롛'):
+        return [char, chr(o + ord('아') - ord('라'))]
+    if ord('라') <= o <= ord('랗') or\
+        ord('래') <= o <= ord('랳') or\
+        ord('로') <= o <= ord('롷') or\
+        ord('루') <= o <= ord('뤃') or\
+        ord('르') <= o <= ord('릏') or\
+        ord('뢰') <= o <= ord('룋'):
+        return [char, chr(o + ord('나') - ord('라'))]
+    if ord('녀') <= o <= ord('녛') or\
         ord('뇨') <= o <= ord('눃') or\
         ord('뉴') <= o <= ord('늏') or\
-        ord('니') <= o <= ord('닣') or\
-        ord('냬') <= o <= ord('넇') or\
-        ord('녜') <= o <= ord('녷'):
-        result += ((chr(o + ord('아') - ord('나'))),)
+        ord('니') <= o <= ord('닣'):
+        return [char, chr(o + ord('아') - ord('나'))]
+    return [char]
 
-    else:
-        return result
-    return result
 
 CHO = [
     'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 
@@ -65,6 +59,4 @@ def break_korean(string):
         else:
             break_words.append(k)
     return break_words
-
-
 
