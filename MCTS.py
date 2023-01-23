@@ -106,18 +106,28 @@ class Node:
     def __repr__(self):
         return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 2)})'
 
-node_dump = []
 
-def simulate(node, stack):
+
+def simulate(node, stack, expand = True):
     ptr = node
     stack.append(ptr)
-    while ptr.next_char:
-        if ptr.isComplete():
+    if expand:
+        while True:
+            if ptr.isComplete():
+                ptr = ptr.select()
+            else:
+                ptr = ptr.expand()
+            stack.append(ptr)
+            if not ptr.next_char:
+                break
+        
+    else:
+        while True:
             ptr = ptr.select()
-        else:
-            ptr = ptr.expand()
-            node_dump.append(ptr)
-        stack.append(ptr)
+            stack.append(ptr)
+            if not ptr.next_char:
+                break
+
 def backpropagate(stack):
     alternater = True
     while stack:
@@ -128,13 +138,20 @@ def backpropagate(stack):
 
         alternater = not alternater
 
-def learn(node, num = 50):
+def learn(node, expand = 50, select =0):
     stack = []
-    for i in range(num):
+    for i in range(expand):
         if (i+1) % 100 == 0:
-            print(f'...learning {i+1}회')
+            print(f'...expand {i+1}회')
         simulate(node, stack)
         backpropagate(stack)
+    for i in range(select):
+        if (i+1) % 100 == 0:
+            print(f'...select {i+1}회')
+        simulate(node, stack, expand = False)
+        backpropagate(stack)
+
+    
 
 def recommendNextChar(node):
     return max(node.children, key = lambda x : node.children[x].w / node.children[x].n)
@@ -153,9 +170,9 @@ def game():
         if input_char == "r":
             input_char = recommendNextChar(node)
         node = node.children[input_char]
-        learn(node, 100)
+        
         print("승률 : ", node.winProb())
         [print(child) for child in node.children.values()]
         print("recommnend : ", recommendNextChar(node))
-    
+root = Node('삭')
 game()
