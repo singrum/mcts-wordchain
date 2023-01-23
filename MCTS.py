@@ -174,5 +174,5 @@ def game():
         print("승률 : ", node.winProb())
         [print(child) for child in node.children.values()]
         print("recommnend : ", recommendNextChar(node))
-root = Node('삭')
+        
 game()
