@@ -138,7 +138,7 @@ def backpropagate(stack):
 
         alternater = not alternater
 
-def learn(node, expand = 50, select =0):
+def learn(node, expand = 50, select =0): # expand : 200회 넘어가면 killed
     stack = []
     for i in range(expand):
         if (i+1) % 100 == 0:
@@ -160,7 +160,7 @@ def recommendNextChar(node):
 def game():
     root = Node(input("start : "))
     node = root
-    learn(node, 200)
+    learn(node, 100,1000)
     print("승률 : ", node.winProb())
     [print(child) for child in node.children.values()]
     print("recommnend : ", recommendNextChar(node))
@@ -170,7 +170,7 @@ def game():
         if input_char == "r":
             input_char = recommendNextChar(node)
         node = node.children[input_char]
-        
+        learn(node, 50,500)
         print("승률 : ", node.winProb())
         [print(child) for child in node.children.values()]
         print("recommnend : ", recommendNextChar(node))
