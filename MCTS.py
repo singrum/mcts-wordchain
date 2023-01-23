@@ -73,10 +73,8 @@ class Node:
         return selectedChild
     
     def UTC(self):
-        return self.w / self.n + math.sqrt(2 * math.log(self.t()) / self.n)
+        return self.w / self.n + math.sqrt(2 * math.log(self.parent.n) / self.n)
     
-    def t(self):
-        return self.parent.n
     
     def expand(self):
         for char in self.next_char:
