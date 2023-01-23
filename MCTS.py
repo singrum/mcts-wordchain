@@ -160,19 +160,19 @@ def recommendNextChar(node):
 def game():
     root = Node(input("start : "))
     node = root
-    learn(node, 100,1000)
+    learn(node, 100,0)
     print("승률 : ", node.winProb())
     [print(child) for child in node.children.values()]
-    print("recommnend : ", recommendNextChar(node))
+    print("recommend : ", recommendNextChar(node))
     while True:
         print()
         input_char = input("input : ")
         if input_char == "r":
             input_char = recommendNextChar(node)
         node = node.children[input_char]
-        learn(node, 50,500)
+        learn(node, 50,0)
         print("승률 : ", node.winProb())
         [print(child) for child in node.children.values()]
-        print("recommnend : ", recommendNextChar(node))
+        print("recommend : ", recommendNextChar(node))
         
 game()
