@@ -99,12 +99,16 @@ class Node:
     def loseProb(self):
         return self.w/self.n
 
+    def winProb(self):
+        return 1 - self.w/self.n
+
     def __str__(self):
         return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 2)})'
 
     def __repr__(self):
         return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 2)})'
 
+node_dump = []
 
 def simulate(node, stack):
     ptr = node
@@ -114,6 +118,7 @@ def simulate(node, stack):
             ptr = ptr.select()
         else:
             ptr = ptr.expand()
+            node_dump.append(ptr)
         stack.append(ptr)
 def backpropagate(stack):
     alternater = True
@@ -129,7 +134,7 @@ def learn(node, num = 50):
     stack = []
     for i in range(num):
         if (i+1) % 100 == 0:
-            print(f'{i+1}회')
+            print(f'...learning {i+1}회')
         simulate(node, stack)
         backpropagate(stack)
 
@@ -139,16 +144,20 @@ def recommendNextChar(node):
 
 def game():
     root = Node(input("start : "))
-    learn(root, 200)
-    print(root.children)
-    print(recommendNextChar(root))
     node = root
+    learn(node, 200)
+    print("승률 : ", node.winProb())
+    [print(child) for child in node.children.values()]
+    print("recommnend : ", recommendNextChar(node))
     while True:
+        print()
         input_char = input("input : ")
         if input_char == "r":
             input_char = recommendNextChar(node)
         node = node.children[input_char]
-        print(node.children)
+        learn(node, 100)
+        print("승률 : ", node.winProb())
+        [print(child) for child in node.children.values()]
         print("recommnend : ", recommendNextChar(node))
     
 game()
