@@ -152,22 +152,18 @@ def backpropagate(stack):
 
         alternater = not alternater
 
-def learn(node, expand = 50, select =0): # expand : 200회 넘어가면 killed
+def learn(node, expand = 50): # expand : 200회 넘어가면 killed
     
     stack = []
-    print(f'...expand {expand}times')
+    print(f'...learning start ({expand} times)')
     j = 1
     for i in range(expand):
         if (i+1) == expand * j// 10:
-            print(f'...expand {j}0%')
+            print(f'...learning {j}0%')
             j += 1
         simulate(node, stack)
         backpropagate(stack)
-    for i in range(select):
-        if (i+1) % 100 == 0:
-            print(f'...select {i+1}회')
-        simulate(node, stack, expand = False)
-        backpropagate(stack)
+
 
     
 
@@ -175,7 +171,7 @@ def recommendNextChar(node):
     return max(node.children, key = lambda x : node.children[x].w / node.children[x].n)
     
 
-def game():
+def game(firstLearningNum, restLearningNum):
     i = 1
     # 처음 음절 제시
     while 1:
@@ -184,7 +180,7 @@ def game():
             break
     root = Node(input_char, history = {})
     node = root
-    learn(node, 4000,0)
+    learn(node, firstLearningNum)
     print("승률 : ", node.winProb())
     [print(child) for child in sorted(node.children.values(), key = lambda x : x.w/x.n, reverse=True)]
     print("recommend : ", recommendNextChar(node))
@@ -196,16 +192,19 @@ def game():
         print()
         while 1:
             input_char = input(f"input[{i}] : ")
-            if input_char in all_words_graph:
+            if input_char in all_words_graph or input_char == "r":
                 break
             
         if input_char == "r":
             input_char = recommendNextChar(node)
+        if input_char not in node.children:
+            print("Game End")
+            break
         node = node.children[input_char]
-        learn(node, 200,0)
+        learn(node, restLearningNum)
         print("승률 : ", node.winProb())
         [print(child) for child in sorted(node.children.values(), key = lambda x : x.w/x.n, reverse=True)]
         print("recommend : ", recommendNextChar(node))
         
-game()
+game(firstLearningNum = 3000, restLearningNum = 100)
 
