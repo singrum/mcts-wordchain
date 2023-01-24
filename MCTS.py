@@ -60,15 +60,18 @@ def showDict(d):
 
 
 makeChangableNode(all_words_graph)
-# 두음 노드는 써도 사라지지 않음
+
 
 class Node:
-    def __init__(self, curr_char, parent = None, graph = all_words_graph):
+
+    def __init__(self, curr_char, history, parent = None): 
         self.n, self.w = 0, 0
         self.parent = parent
         self.curr_char = curr_char
-        self.graph = graph
-        self.next_char = self.graph[self.curr_char]
+        self.history = history # history에 두음 엣지는 없음
+        self.next_char = all_words_graph[self.curr_char].copy()
+        if self.curr_char in self.history:
+            self.next_char -= self.history[self.curr_char]
         self.children = {}
 
     def select(self):
@@ -83,15 +86,20 @@ class Node:
     def expand(self):
         for char in self.next_char:
             if char not in self.children:
-                graph_copy = copy(self.graph)
-                if not (type(self.curr_char) == tuple or type(char) == tuple):
-                    graph_copy[self.curr_char][char] -= 1
-                    if graph_copy[self.curr_char][char] == 0:
-                        graph_copy[self.curr_char].pop(char)
-                child = Node(char, self, graph_copy)
+                child = self.makeChild(char)
                 self.children[char] = child
                 return child
-        
+
+    def makeChild(self, char):
+        history_copy = copy(self.history)
+        if not (type(self.curr_char) == tuple or type(char) == tuple):
+            if self.curr_char not in history_copy:
+                history_copy[self.curr_char] = Counter({})
+            history_copy[self.curr_char][char] += 1
+
+        child = Node(char, history = history_copy, parent = self)
+        return child
+    
     def isEnd(self):
         return False if self.next_char else True
     
@@ -105,10 +113,10 @@ class Node:
         return 1 - self.w/self.n
 
     def __str__(self):
-        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 2)})'
+        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n)})'
 
     def __repr__(self):
-        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 2)})'
+        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n)})'
 
 
 
@@ -122,8 +130,10 @@ def simulate(node, stack, expand = True):
             else:
                 ptr = ptr.expand()
             stack.append(ptr)
+
             if not ptr.next_char:
                 break
+                
         
     else:
         while True:
@@ -143,8 +153,21 @@ def backpropagate(stack):
         alternater = not alternater
 
 def learn(node, expand = 50, select =0): # expand : 200회 넘어가면 killed
+    
     stack = []
     for i in range(expand):
+
+
+
+        #debug
+
+        # print(node.curr_char)
+        # print(node.next_char)
+        # print(node.children)
+
+
+
+
         if (i+1) % 100 == 0:
             print(f'...expand {i+1}회')
         simulate(node, stack)
@@ -152,6 +175,7 @@ def learn(node, expand = 50, select =0): # expand : 200회 넘어가면 killed
     for i in range(select):
         if (i+1) % 100 == 0:
             print(f'...select {i+1}회')
+        print("\nnew simulate")
         simulate(node, stack, expand = False)
         backpropagate(stack)
 
@@ -162,9 +186,9 @@ def recommendNextChar(node):
     
 
 def game():
-    root = Node(input("start : "))
+    root = Node(input("start : "), history = {})
     node = root
-    learn(node, 100,0)
+    learn(node, 1000,0)
     print("승률 : ", node.winProb())
     [print(child) for child in node.children.values()]
     print("recommend : ", recommendNextChar(node))
@@ -180,3 +204,4 @@ def game():
         print("recommend : ", recommendNextChar(node))
         
 game()
+
