@@ -167,7 +167,7 @@ def game():
     learn(node, 100,0)
     print("승률 : ", node.winProb())
     [print(child) for child in node.children.values()]
-    print("recommnend : ", recommendNextChar(node))
+    print("recommend : ", recommendNextChar(node))
     while True:
         print()
         input_char = input("input : ")
@@ -177,6 +177,6 @@ def game():
         learn(node, 50,0)
         print("승률 : ", node.winProb())
         [print(child) for child in node.children.values()]
-        print("recommnend : ", recommendNextChar(node))
+        print("recommend : ", recommendNextChar(node))
         
 game()
