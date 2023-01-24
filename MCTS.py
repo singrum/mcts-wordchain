@@ -1,3 +1,7 @@
+# Node에 다음에 올 음절들, 히스토리만 저장
+
+
+
 
 import changable
 import pickle
@@ -160,7 +164,7 @@ def recommendNextChar(node):
 def game():
     root = Node(input("start : "))
     node = root
-    learn(node, 100,1000)
+    learn(node, 100,0)
     print("승률 : ", node.winProb())
     [print(child) for child in node.children.values()]
     print("recommnend : ", recommendNextChar(node))
@@ -170,7 +174,7 @@ def game():
         if input_char == "r":
             input_char = recommendNextChar(node)
         node = node.children[input_char]
-        learn(node, 50,500)
+        learn(node, 50,0)
         print("승률 : ", node.winProb())
         [print(child) for child in node.children.values()]
         print("recommnend : ", recommendNextChar(node))
