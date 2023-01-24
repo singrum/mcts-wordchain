@@ -113,10 +113,10 @@ class Node:
         return 1 - self.w/self.n
 
     def __str__(self):
-        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n)})'
+        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 3)})'
 
     def __repr__(self):
-        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n)})'
+        return f'({self.curr_char}, {self.w}/{self.n}, {round(self.w/self.n, 3)})'
 
 
 
@@ -155,27 +155,17 @@ def backpropagate(stack):
 def learn(node, expand = 50, select =0): # expand : 200회 넘어가면 killed
     
     stack = []
+    print(f'...expand {expand}times')
+    j = 1
     for i in range(expand):
-
-
-
-        #debug
-
-        # print(node.curr_char)
-        # print(node.next_char)
-        # print(node.children)
-
-
-
-
-        if (i+1) % 100 == 0:
-            print(f'...expand {i+1}회')
+        if (i+1) == expand * j// 10:
+            print(f'...expand {j}0%')
+            j += 1
         simulate(node, stack)
         backpropagate(stack)
     for i in range(select):
         if (i+1) % 100 == 0:
             print(f'...select {i+1}회')
-        print("\nnew simulate")
         simulate(node, stack, expand = False)
         backpropagate(stack)
 
@@ -186,21 +176,35 @@ def recommendNextChar(node):
     
 
 def game():
-    root = Node(input("start : "), history = {})
+    i = 1
+    # 처음 음절 제시
+    while 1:
+        input_char = input(f"input[{i}] : ")
+        if input_char in all_words_graph:
+            break
+    root = Node(input_char, history = {})
     node = root
-    learn(node, 1000,0)
+    learn(node, 4000,0)
     print("승률 : ", node.winProb())
-    [print(child) for child in node.children.values()]
+    [print(child) for child in sorted(node.children.values(), key = lambda x : x.w/x.n, reverse=True)]
     print("recommend : ", recommendNextChar(node))
+
+
+    #그담부터
     while True:
+        i += 1
         print()
-        input_char = input("input : ")
+        while 1:
+            input_char = input(f"input[{i}] : ")
+            if input_char in all_words_graph:
+                break
+            
         if input_char == "r":
             input_char = recommendNextChar(node)
         node = node.children[input_char]
-        learn(node, 50,0)
+        learn(node, 200,0)
         print("승률 : ", node.winProb())
-        [print(child) for child in node.children.values()]
+        [print(child) for child in sorted(node.children.values(), key = lambda x : x.w/x.n, reverse=True)]
         print("recommend : ", recommendNextChar(node))
         
 game()
