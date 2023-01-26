@@ -61,7 +61,7 @@ def showDict(d):
 
 makeChangableNode(all_words_graph)
 
-
+nodesMemory = []
 class Node:
 
     def __init__(self, curr_char, history, parent = None): 
@@ -98,6 +98,7 @@ class Node:
             history_copy[self.curr_char][char] += 1
 
         child = Node(char, history = history_copy, parent = self)
+        nodesMemory.append(child)
         return child
     
     def isEnd(self):
@@ -172,7 +173,7 @@ def recommendNextChar(node):
     
 
 def game(firstLearningNum, restLearningNum):
-    i = 1
+    i = 0
     # 처음 음절 제시
     while 1:
         input_char = input(f"input[{i}] : ")
@@ -184,7 +185,7 @@ def game(firstLearningNum, restLearningNum):
     print("승률 : ", node.winProb())
     [print(child) for child in sorted(node.children.values(), key = lambda x : x.w/x.n, reverse=True)]
     print("recommend : ", recommendNextChar(node))
-
+    
 
     #그담부터
     while True:
@@ -206,5 +207,13 @@ def game(firstLearningNum, restLearningNum):
         [print(child) for child in sorted(node.children.values(), key = lambda x : x.w/x.n, reverse=True)]
         print("recommend : ", recommendNextChar(node))
         
-game(firstLearningNum = 3000, restLearningNum = 100)
 
+
+
+def wordsToHistory(*words):
+    history = {}
+    for word in words:
+        if word[0] not in history:
+            history[word[0]] = Counter({})
+        history[word[0]][word[-1]] += 1
+    return history
