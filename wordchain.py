@@ -41,6 +41,7 @@ class IndexManager:
         self.cir_index = set()
         self.set_index(self.rule.word_list)
         self.win_word_dict = {}
+        self.index_class = {"win" : [], "los" : [], "cir" : []}
 
     def next_words(self, index):
         result = set()
@@ -68,27 +69,39 @@ class IndexManager:
         updated_index = set()
         is_updated = True
         while is_updated == True:
-
-            i += 1
             is_updated = False
 
+            temp = []
             for index in self.cir_index:
                 if index in updated_index:
                     continue
 
                 if self.__is_los_index(index):
                     self.los_index.add(index)
+                    temp.append(index)
                     is_updated = True
                     updated_index.add(index)
-                    continue
+            self.cir_index -= updated_index      
+            
+            self.index_class['los'].append(sorted(temp.copy()))
 
+            temp = []
+            for index in self.cir_index:
+                if index in updated_index:
+                    continue
                 if self.__is_win_index(index):
                     self.win_index.add(index)
+                    temp.append(index)
                     is_updated = True
                     updated_index.add(index)
-
             self.cir_index -= updated_index
+            self.index_class['win'].append(sorted(temp.copy()))
 
+            i += 1
+        self.index_class['los'].pop()
+        self.index_class['win'].pop()
+        self.index_class['win'].pop()
+        self.index_class['cir'] = sorted(list(self.cir_index))
         return updated_index
 
     def show_index_cls(self):
