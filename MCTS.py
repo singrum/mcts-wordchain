@@ -217,13 +217,3 @@ def wordsToHistory(*words):
             history[word[0]] = Counter({})
         history[word[0]][word[-1]] += 1
     return history
-
-print(all_words_graph)
-
-
-with open("flourish_data.txt", 'w') as f:
-    result = ''
-    for char in all_words_graph:
-        for head in all_words_graph[char].elements():
-            result += ','.join(char) + '\t' + ','.join(head) + '\n'
-    f.write(result)
